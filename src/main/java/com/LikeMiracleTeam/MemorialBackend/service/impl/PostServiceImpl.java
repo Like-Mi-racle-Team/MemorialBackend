@@ -101,6 +101,7 @@ public class PostServiceImpl implements PostService {
                 .isPublic(request.getIs_public())
                 .fileName(fileName)
                 .oriFileName(file.getName())
+                .like(0)
                 .build();
         try {
             postRepository.save(post);
@@ -110,6 +111,7 @@ public class PostServiceImpl implements PostService {
             } catch (IOException e2) {
                 return ResponseEntity.internalServerError().build();
             }
+            return ResponseEntity.badRequest().build();
         }
 
         return ResponseEntity.ok(new PostResponse(post));

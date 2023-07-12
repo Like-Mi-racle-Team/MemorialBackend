@@ -41,4 +41,12 @@ public class Post extends BaseTimeEntity {
             this.isPublic = isPublic;
         }
     }
+
+    public void like() {
+        like++;
+    }
+
+    public void cancelLike() {
+        like--;
+    }
 }

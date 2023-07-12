@@ -10,12 +10,16 @@ import com.LikeMiracleTeam.MemorialBackend.repository.PostRepository;
 import com.LikeMiracleTeam.MemorialBackend.repository.UserLikePostRepository;
 import com.LikeMiracleTeam.MemorialBackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +32,36 @@ public class PostServiceImpl implements PostService {
     //**********************************************//
     //************* crud 여기부터 *******************//
     //**********************************************//
+
+
+    @Override
+    public ResponseEntity<List<PostResponse>> getRecommendPosts() {
+            int count = 20; // 난수 생성 갯수
+            int a[] = new int[count];
+            Random r = new Random();
+
+            for(int i=0; i<count; i++) {
+                a[i] = r.nextInt(100) + 1; // 1 ~ 99까지의 난수
+                for (int j = 0; j < i; j++) {
+                    if (a[i] == a[j]) {
+                        i--;
+                    }
+                }
+            }
+
+            List<Post> posts = new ArrayList<>();
+            List<Post> betsPosts = getBestPosts();
+        for (int i = 0; i < count; i++) {
+            posts.add(betsPosts.get(a[i]));
+        }
+
+        return ResponseEntity.ok(posts.stream().map(PostResponse::new).toList());
+    }
+
+    @Cacheable(cacheNames = "bestPosts", key = "#root.target + #root.methodName + '_' + #p0")
+    public List<Post> getBestPosts() {
+        return postRepository.findByIsPublicTrueOrderByLikeDesc();
+    }
 
     @Override
     public ResponseEntity<PostResponse> getPost(Long postNo) {

@@ -22,18 +22,12 @@ public class SwaggerConfig implements WebMvcConfigurer {
     private static final String API_NAME = "Memorial API docs";
     private static final String API_VERSION = "0.0.1";
 
-    @Override public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
-    }
-
     @Bean
     public Docket swagger() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
+                .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
                 .build(); }
 

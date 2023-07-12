@@ -40,4 +40,22 @@ public class User extends BaseTimeEntity {
         return this.userId.equals(user.getUserId());
     }
 
+    public void update(String id, String password, String name, String introduce) {
+        if (id != null) {
+            this.userId = id;
+        }
+
+        if (password != null) {
+            this.password = password;
+        }
+
+        if (name != null) {
+            this.name = name;
+        }
+
+        if (introduce != null) {
+            this.introduce = introduce;
+        }
+
+    }
 }

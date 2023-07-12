@@ -8,16 +8,17 @@ import com.LikeMiracleTeam.MemorialBackend.entity.User;
 import com.LikeMiracleTeam.MemorialBackend.filter.JwtProvider;
 import com.LikeMiracleTeam.MemorialBackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.header.Header;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -62,4 +63,45 @@ public class UserService {
         return new ResponseEntity<>(principalDetails.toDto(), headers, HttpStatus.OK);
 
     }
+
+    @Transactional
+    public ResponseEntity<UserResponse> modified(String tokenString, UserRequest request) {
+
+        User user = userRepository.findByUserId(jwtProvider.getId(tokenString)).get();
+
+        if (userRepository.existsByUserId(jwtProvider.getId(tokenString))) {
+            return ResponseEntity.ok(new UserResponse(user));
+        }
+        user.update(request.getUserId(), request.getUserPassword(), request.getUserName(), request.getUserIntroduce());
+
+        return ResponseEntity.ok(new UserResponse(user));
+
+    }
+
+    public ResponseEntity<UserResponse> delete(String tokenString, UserRequest request) {
+
+        User user = userRepository.findByUserId(jwtProvider.getId(tokenString)).get();
+
+        userRepository.delete(user);
+
+        return ResponseEntity.ok(new UserResponse(user));
+    }
+
+    public ResponseEntity<Page<UserResponse>> findByName(String userName, final Pageable pageable) {
+
+        Page<User> users = userRepository.findAllByName(userName, pageable);
+
+        return ResponseEntity.ok(users.map(UserResponse::new));
+    }
+
+    public ResponseEntity<UserResponse> findById(String userId) {
+        Optional<User> optionalUser = userRepository.findByUserId(userId);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        User user = optionalUser.get();
+
+        return ResponseEntity.ok(new UserResponse(user));
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.LikeMiracleTeam.MemorialBackend.filter;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
@@ -20,16 +22,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = parseJwt(request);
-        if(jwtProvider.validateToken(token)){
+        if (jwtProvider.validateToken(token)) {
+            log.info("dfjsdl");
             Authentication auth = jwtProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
-        filterChain.doFilter(request,response);
+        log.info("dfjsddsfsfdfsfdsfl");
+        filterChain.doFilter(request, response);
     }
 
-    private String parseJwt(HttpServletRequest request){
+
+    private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
-        if(StringUtils.hasText(headerAuth)){
+        if (StringUtils.hasText(headerAuth)) {
             return headerAuth;
         }
         return null;

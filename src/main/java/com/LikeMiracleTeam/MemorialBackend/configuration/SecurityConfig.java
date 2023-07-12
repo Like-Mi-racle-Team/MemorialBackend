@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,6 +22,22 @@ import java.util.List;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtProvider jwtProvider;
+
+    private static final String[] SWAGGER_PATH = {
+            "/swagger*/**",
+            "/swagger-ui.html",
+    };
+
+    private static final String[] UNAUTH_PATH = {
+
+    };
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+                .antMatchers(SWAGGER_PATH)
+                .antMatchers(UNAUTH_PATH);
+    }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {

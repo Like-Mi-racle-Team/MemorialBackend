@@ -8,8 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRequest {
-    private String userId;
-    private String userPassword;
-    private String userName;
-    private String userIntroduce;
+    private String user_id;
+    private String user_password;
+    private String user_name;
+    private String user_introduce;
 }

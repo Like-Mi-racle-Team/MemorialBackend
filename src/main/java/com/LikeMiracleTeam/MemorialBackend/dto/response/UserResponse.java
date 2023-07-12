@@ -9,13 +9,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserResponse {
-    private String username;
-    private String userId;
+    private String user_name;
+    private String user_id;
     private String introduce;
 
     public UserResponse(User user) {
-        this.username = user.getName();
-        this.userId = user.getUserId();
+        this.user_name = user.getName();
+        this.user_id = user.getUserId();
         this.introduce = user.getIntroduce();
     }
 }

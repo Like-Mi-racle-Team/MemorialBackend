@@ -1,5 +1,6 @@
 package com.LikeMiracleTeam.MemorialBackend.entity;
 
+import com.LikeMiracleTeam.MemorialBackend.entity.baseEntity.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Builder
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_pk")

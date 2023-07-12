@@ -1,4 +1,4 @@
-package com.LikeMiracleTeam.MemorialBackend.service;
+package com.LikeMiracleTeam.MemorialBackend.service.impl;
 
 import com.LikeMiracleTeam.MemorialBackend.dto.request.PostRequest;
 import com.LikeMiracleTeam.MemorialBackend.dto.response.PostResponse;
@@ -9,6 +9,7 @@ import com.LikeMiracleTeam.MemorialBackend.filter.JwtProvider;
 import com.LikeMiracleTeam.MemorialBackend.repository.PostRepository;
 import com.LikeMiracleTeam.MemorialBackend.repository.UserLikePostRepository;
 import com.LikeMiracleTeam.MemorialBackend.repository.UserRepository;
+import com.LikeMiracleTeam.MemorialBackend.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -29,19 +30,15 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final UserLikePostRepository userLikePostRepository;
 
-    //**********************************************//
-    //************* crud 여기부터 *******************//
-    //**********************************************//
-
 
     @Override
     public ResponseEntity<List<PostResponse>> getRecommendPosts() {
-            int count = 20; // 난수 생성 갯수
+            int count = 20;
             int a[] = new int[count];
             Random r = new Random();
 
             for(int i=0; i<count; i++) {
-                a[i] = r.nextInt(100) + 1; // 1 ~ 99까지의 난수
+                a[i] = r.nextInt(100) + 1;
                 for (int j = 0; j < i; j++) {
                     if (a[i] == a[j]) {
                         i--;
@@ -126,9 +123,6 @@ public class PostServiceImpl implements PostService {
         return ResponseEntity.ok(new PostResponse(post));
     }
 
-    //**********************************************//
-    //************* crud 여기까지 *******************//
-    //**********************************************//
 
     @Override
     public ResponseEntity<Void> like(String tokenString, Long postNo) {

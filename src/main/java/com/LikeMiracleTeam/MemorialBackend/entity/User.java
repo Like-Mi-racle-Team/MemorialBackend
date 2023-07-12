@@ -1,5 +1,6 @@
 package com.LikeMiracleTeam.MemorialBackend.entity;
 
+import com.LikeMiracleTeam.MemorialBackend.entity.baseEntity.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,7 +11,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Builder
-public class User {
+public class User extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_pk")
@@ -39,4 +41,22 @@ public class User {
         return this.userId.equals(user.getUserId());
     }
 
+    public void update(String id, String password, String name, String introduce) {
+        if (id != null) {
+            this.userId = id;
+        }
+
+        if (password != null) {
+            this.password = password;
+        }
+
+        if (name != null) {
+            this.name = name;
+        }
+
+        if (introduce != null) {
+            this.introduce = introduce;
+        }
+
+    }
 }

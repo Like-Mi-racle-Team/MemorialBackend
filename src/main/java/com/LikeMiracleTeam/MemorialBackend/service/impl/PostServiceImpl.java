@@ -9,6 +9,7 @@ import com.LikeMiracleTeam.MemorialBackend.filter.JwtProvider;
 import com.LikeMiracleTeam.MemorialBackend.repository.PostRepository;
 import com.LikeMiracleTeam.MemorialBackend.repository.UserLikePostRepository;
 import com.LikeMiracleTeam.MemorialBackend.repository.UserRepository;
+import com.LikeMiracleTeam.MemorialBackend.service.FileService;
 import com.LikeMiracleTeam.MemorialBackend.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -16,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +32,7 @@ public class PostServiceImpl implements PostService {
     private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
     private final UserLikePostRepository userLikePostRepository;
+    private final FileService fileService;
 
 
     @Override
@@ -72,14 +76,25 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ResponseEntity<PostResponse> createPost(String tokenString, PostRequest request) {
+    public ResponseEntity<PostResponse> createPost(String tokenString, PostRequest request, MultipartFile file) {
         User user = userRepository.findByUserId(jwtProvider.getId(tokenString)).get();
+
+        String fileName = null;
+        if (!file.isEmpty() || file!= null) {
+            try {
+                fileName = fileService.saveFile(file);
+            } catch (IOException e) {
+                return ResponseEntity.internalServerError().build();
+            }
+        }
 
         Post post = Post.builder()
                 .user(user)
                 .content(request.getContent())
                 .isPublic(request.getIs_public())
                 .like(0)
+                .fileName(fileName)
+                .oriFileName(file.getName())
                 .build();
         postRepository.save(post);
 
@@ -88,7 +103,7 @@ public class PostServiceImpl implements PostService {
 
     @Transactional
     @Override
-    public ResponseEntity<PostResponse> updatePost(String tokenString, PostRequest request, Long postNo) {
+    public ResponseEntity<PostResponse> updatePost(String tokenString, PostRequest request, MultipartFile file, Long postNo) {
         Optional<Post> optionalPost = postRepository.findById(postNo);
         if (optionalPost.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -100,7 +115,18 @@ public class PostServiceImpl implements PostService {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        post.update(request.getContent(), request.getIs_public());
+        String fileName = null;
+        if (!file.isEmpty() || file!= null) {
+            try {
+                fileService.deleteFile(post.getFileName());
+                fileName = fileService.saveFile(file);
+            } catch (IOException e) {
+                return ResponseEntity.internalServerError().build();
+            }
+        }
+
+
+        post.update(request.getContent(), request.getIs_public(), file.getName(), fileName);
 
         return ResponseEntity.ok(new PostResponse(post));
     }

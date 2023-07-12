@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class PostResponse {
+    private Long postNo;
     private String writer_name;
     private String writer_id;
     private String content;
@@ -17,6 +18,7 @@ public class PostResponse {
     private LocalDateTime modified_at;
 
     public PostResponse(Post post) {
+        this.postNo = post.getPostPk();
         this.writer_name = post.getUser().getName();
         this.writer_id = post.getUser().getUserId();
         this.content = post.getContent();

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CommentResponse {
+    private Long commentNo;
     private String writer_name;
     private String writer_id;
     private String content;
@@ -16,6 +17,7 @@ public class CommentResponse {
     private LocalDateTime modified_at;
 
     public CommentResponse(Comment comment) {
+        this.commentNo = comment.getCommentPk();
         this.writer_name = comment.getUser().getName();
         this.writer_id = comment.getUser().getUserId();
         this.content = comment.getContent();

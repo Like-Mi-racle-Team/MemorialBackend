@@ -33,12 +33,24 @@ public class Post extends BaseTimeEntity {
     @Column(name = "like")
     private Integer like;
 
-    public void update(String content, Boolean isPublic) {
+    @Column(name = "file_name")
+    private String fileName;
+
+    @Column(name = "ori_file_name")
+    private String oriFileName;
+
+    public void update(String content, Boolean isPublic, String oriFileName, String fileName) {
         if (content != null) {
             this.content = content;
         }
         if (isPublic != null) {
             this.isPublic = isPublic;
+        }
+        if (oriFileName != null) {
+            this.oriFileName = oriFileName;
+        }
+        if (fileName != null) {
+            this.fileName = fileName;
         }
     }
 

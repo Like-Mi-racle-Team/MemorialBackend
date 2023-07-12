@@ -87,16 +87,19 @@ public class UserService {
         return ResponseEntity.ok(new UserResponse(user));
     }
 
-    public ResponseEntity<Page<UserResponse>> findByName(UserRequest request, final Pageable pageable) {
+    public ResponseEntity<Page<UserResponse>> findByName(String userName, final Pageable pageable) {
 
-        Page<User> users = userRepository.findAllByName(request.getUserName(), pageable);
+        Page<User> users = userRepository.findAllByName(userName, pageable);
 
         return ResponseEntity.ok(users.map(UserResponse::new));
     }
 
-    public ResponseEntity<UserResponse> findById(UserRequest request) {
-
-        User user = userRepository.findByUserId(request.getUserId()).get();
+    public ResponseEntity<UserResponse> findById(String userId) {
+        Optional<User> optionalUser = userRepository.findByUserId(userId);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        User user = optionalUser.get();
 
         return ResponseEntity.ok(new UserResponse(user));
     }

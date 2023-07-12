@@ -5,6 +5,7 @@ import com.LikeMiracleTeam.MemorialBackend.dto.response.PostResponse;
 import com.LikeMiracleTeam.MemorialBackend.entity.Post;
 import com.LikeMiracleTeam.MemorialBackend.entity.User;
 import com.LikeMiracleTeam.MemorialBackend.entity.UserLikePost;
+import com.LikeMiracleTeam.MemorialBackend.entity.primaryKey.UserLikePostId;
 import com.LikeMiracleTeam.MemorialBackend.filter.JwtProvider;
 import com.LikeMiracleTeam.MemorialBackend.repository.PostRepository;
 import com.LikeMiracleTeam.MemorialBackend.repository.UserLikePostRepository;
@@ -12,6 +13,7 @@ import com.LikeMiracleTeam.MemorialBackend.repository.UserRepository;
 import com.LikeMiracleTeam.MemorialBackend.service.FileService;
 import com.LikeMiracleTeam.MemorialBackend.service.PostService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final JwtProvider jwtProvider;
@@ -37,21 +40,25 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ResponseEntity<List<PostResponse>> getRecommendPosts() {
-            int count = 20;
-            int a[] = new int[count];
-            Random r = new Random();
+        Random r = new Random();
+        List<Post> posts = new ArrayList<>();
+        List<Post> betsPosts = getBestPosts();
 
-            for(int i=0; i<count; i++) {
-                a[i] = r.nextInt(100) + 1;
-                for (int j = 0; j < i; j++) {
-                    if (a[i] == a[j]) {
-                        i--;
-                    }
+        int count = Math.min(betsPosts.size(), 20);
+        int a[] = new int[count];
+
+        for(int i=0; i<count; i++) {
+            a[i] = r.nextInt(Math.min(betsPosts.size(), 100));
+            for (int j = 0; j < i; j++) {
+                if (a[i] == a[j]) {
+                    i--;
                 }
             }
+        }
+            if (betsPosts.isEmpty()) {
+               return ResponseEntity.noContent().build();
+            }
 
-            List<Post> posts = new ArrayList<>();
-            List<Post> betsPosts = getBestPosts();
         for (int i = 0; i < count; i++) {
             posts.add(betsPosts.get(a[i]));
         }
@@ -92,11 +99,20 @@ public class PostServiceImpl implements PostService {
                 .user(user)
                 .content(request.getContent())
                 .isPublic(request.getIs_public())
-                .like(0)
                 .fileName(fileName)
                 .oriFileName(file.getName())
+                .like(0)
                 .build();
-        postRepository.save(post);
+        try {
+            postRepository.save(post);
+        } catch (Exception e1) {
+            try {
+                fileService.deleteFile(fileName);
+            } catch (IOException e2) {
+                return ResponseEntity.internalServerError().build();
+            }
+            return ResponseEntity.badRequest().build();
+        }
 
         return ResponseEntity.ok(new PostResponse(post));
     }
@@ -151,21 +167,26 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
+    @Transactional
     public ResponseEntity<Void> like(String tokenString, Long postNo) {
         Optional<Post> optionalPost = postRepository.findById(postNo);
         if (optionalPost.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         Post post = optionalPost.get();
-        post.like();
 
         User user = userRepository.findByUserId(jwtProvider.getId(tokenString)).get();
 
+        if(userLikePostRepository.existsByUserAndPost(user, post)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        post.like();
         UserLikePost userLikePost = UserLikePost.builder()
+                .userLikePostId(new UserLikePostId(user.getUserPk(), post.getPostPk()))
                 .user(user)
                 .post(post)
                 .build();
-
         userLikePostRepository.save(userLikePost);
 
         return ResponseEntity.ok().build();
@@ -173,13 +194,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<Void> cancelLike(String tokenString, Long postNo) {
         Optional<Post> optionalPost = postRepository.findById(postNo);
         if (optionalPost.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         Post post = optionalPost.get();
-        post.cancelLike();
 
         User user = userRepository.findByUserId(jwtProvider.getId(tokenString)).get();
 
@@ -189,6 +210,7 @@ public class PostServiceImpl implements PostService {
         }
         UserLikePost userLikePost = optionalUserLikePost.get();
 
+        post.cancelLike();
         userLikePostRepository.delete(userLikePost);
 
         return ResponseEntity.ok().build();

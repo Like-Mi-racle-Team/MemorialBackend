@@ -10,7 +10,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/post")
 @RequiredArgsConstructor
+@Slf4j
 public class PostController {
     private final PostService postService;
     private final FileService fileService;
@@ -38,15 +42,17 @@ public class PostController {
         return postService.getPost(postNo);
     }
 
-    @GetMapping("/{postNo}/file")
+    @GetMapping(path = "/{postNo}/file", produces = MediaType.IMAGE_PNG_VALUE)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "게시물이 존재치 않음"),
             @ApiResponse(code = 500, message = "파일 업로드 오류, 혹은 예상치 못한 오류 발생")
     })
-    public ResponseEntity<Resource> getPostFile(@ApiParam(value = "조회할 게시물의 postNo") @PathVariable(name = "postNo")Long postNo) {
+    public ResponseEntity<InputStreamResource> getPostFile(@ApiParam(value = "조회할 게시물의 postNo") @PathVariable(name = "postNo")Long postNo) {
         try {
             return fileService.downloadFile(postNo);
         } catch (IOException e) {
+            log.info(String.valueOf(e.getCause()));
+            log.info(e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }

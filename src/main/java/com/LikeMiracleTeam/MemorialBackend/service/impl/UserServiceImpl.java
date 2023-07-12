@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findByUserId(jwtProvider.getId(tokenString)).get();
 
-        user.update(request.getUser_id(), request.getUser_password(), request.getUser_name(), request.getUser_introduce());
+        user.update(request.getUser_id(), passwordEncoder.encode(request.getUser_password()), request.getUser_name(), request.getUser_introduce());
 
         return ResponseEntity.ok(new UserResponse(user));
 

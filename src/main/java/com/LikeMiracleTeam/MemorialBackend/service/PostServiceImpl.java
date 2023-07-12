@@ -108,7 +108,7 @@ public class PostServiceImpl implements PostService {
         return ResponseEntity.ok(new PostResponse(post));
     }
 
-    @Transactional
+    @Override
     public ResponseEntity<PostResponse> deletePost(String tokenString, Long postNo) {
         Optional<Post> optionalPost = postRepository.findById(postNo);
         if (optionalPost.isEmpty()) {
@@ -130,7 +130,7 @@ public class PostServiceImpl implements PostService {
     //************* crud 여기까지 *******************//
     //**********************************************//
 
-    @Transactional
+    @Override
     public ResponseEntity<Void> like(String tokenString, Long postNo) {
         Optional<Post> optionalPost = postRepository.findById(postNo);
         if (optionalPost.isEmpty()) {
@@ -152,7 +152,7 @@ public class PostServiceImpl implements PostService {
 
     }
 
-    @Transactional
+    @Override
     public ResponseEntity<Void> cancelLike(String tokenString, Long postNo) {
         Optional<Post> optionalPost = postRepository.findById(postNo);
         if (optionalPost.isEmpty()) {
@@ -163,10 +163,11 @@ public class PostServiceImpl implements PostService {
 
         User user = userRepository.findByUserId(jwtProvider.getId(tokenString)).get();
 
-        UserLikePost userLikePost = UserLikePost.builder()
-                .user(user)
-                .post(post)
-                .build();
+        Optional<UserLikePost> optionalUserLikePost = userLikePostRepository.findByUserAndPost(user, post);
+        if (optionalUserLikePost.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        UserLikePost userLikePost = optionalUserLikePost.get();
 
         userLikePostRepository.delete(userLikePost);
 

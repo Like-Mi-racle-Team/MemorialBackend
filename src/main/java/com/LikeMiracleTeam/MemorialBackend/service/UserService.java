@@ -65,20 +65,17 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseEntity<UserResponse> modified(String tokenString, UserRequest request) {
+    public ResponseEntity<UserResponse> updateUser(String tokenString, UserRequest request) {
 
         User user = userRepository.findByUserId(jwtProvider.getId(tokenString)).get();
 
-        if (userRepository.existsByUserId(jwtProvider.getId(tokenString))) {
-            return ResponseEntity.ok(new UserResponse(user));
-        }
         user.update(request.getUserId(), request.getUserPassword(), request.getUserName(), request.getUserIntroduce());
 
         return ResponseEntity.ok(new UserResponse(user));
 
     }
 
-    public ResponseEntity<UserResponse> delete(String tokenString, UserRequest request) {
+    public ResponseEntity<UserResponse> deleteUser(String tokenString) {
 
         User user = userRepository.findByUserId(jwtProvider.getId(tokenString)).get();
 

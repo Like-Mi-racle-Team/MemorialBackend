@@ -27,4 +27,14 @@ public class UserController {
         return userService.findById(userId);
     }
 
+    @PatchMapping
+    public ResponseEntity<UserResponse> updateUser(@RequestHeader(name = "Authorization")String tokenString, @RequestBody UserRequest request) {
+        return userService.updateUser(tokenString, request);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<UserResponse> deleteUser(@RequestHeader(name = "Authorization")String tokenString) {
+        return userService.deleteUser(tokenString);
+    }
+
 }

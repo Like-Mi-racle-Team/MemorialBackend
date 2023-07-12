@@ -12,5 +12,7 @@ public interface PostService {
      ResponseEntity<PostResponse> createPost(String tokenString, PostRequest request);
      ResponseEntity<PostResponse> updatePost(String tokenString, PostRequest request, Long postNo);
      ResponseEntity<PostResponse> deletePost(String tokenString,  Long postNo);
+     ResponseEntity<Void> like(String tokenString, Long postNo);
+     ResponseEntity<Void> cancelLike(String tokenString, Long postNo);
 
 }

@@ -12,7 +12,6 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
     @Override
     Optional<Post> findById(Long Id);
-
     List<Post> findByIsPublicTrueOrderByLikeDesc();
 
 }

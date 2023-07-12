@@ -54,7 +54,6 @@ dependencies {
 	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 
 }
-
 [compileJava, compileTestJava]*.options*.encoding = "UTF-8"
 
 tasks.named('test') {

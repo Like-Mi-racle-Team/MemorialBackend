@@ -30,14 +30,15 @@ public class Post extends BaseTimeEntity {
     @Column(name = "is_public")
     private Boolean isPublic;
 
-    @Column(name = "like")
-    private Integer like;
 
     @Column(name = "file_name")
     private String fileName;
 
     @Column(name = "ori_file_name")
     private String oriFileName;
+
+    @Column(name = "likes")
+    private Integer like;
 
     public void update(String content, Boolean isPublic, String oriFileName, String fileName) {
         if (content != null) {

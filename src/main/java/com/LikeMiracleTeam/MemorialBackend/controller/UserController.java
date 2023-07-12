@@ -39,7 +39,7 @@ public class UserController {
 
     @PatchMapping
     public ResponseEntity<UserResponse> updateUser(
-            @ApiParam(value = "엑세스 토큰")@ RequestHeader(name = "Authorization")String tokenString,
+            @ApiParam(value = "엑세스 토큰") @RequestHeader(name = "Authorization")String tokenString,
             @RequestBody UserRequest request) {
         return userService.updateUser(tokenString, request);
     }

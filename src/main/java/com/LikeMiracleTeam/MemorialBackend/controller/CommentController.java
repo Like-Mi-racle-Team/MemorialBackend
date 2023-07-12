@@ -21,6 +21,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/{postNo}")
+    @ApiResponse(code = 204, message = "게시물이 없음")
     public ResponseEntity<Page<CommentResponse>> getComments(
             @ApiParam(value = "찾을 댓글이 쓰인 게시물의 postNo") @PathVariable(name = "postNo")Long postNo,
             @ApiParam(value = "페이징 파라미터") Pageable pageable) {

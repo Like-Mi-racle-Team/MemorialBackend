@@ -28,4 +28,15 @@ public class User {
     @Column(name = "user_introduce")
     private String introduce;
 
+    @Override
+    public boolean equals(Object obj) {
+        User user;
+        if (obj instanceof User) {
+            user = (User) obj;
+        } else {
+            return false;
+        }
+        return this.userId.equals(user.getUserId());
+    }
+
 }

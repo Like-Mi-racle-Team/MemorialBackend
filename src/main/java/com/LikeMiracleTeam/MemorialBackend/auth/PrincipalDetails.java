@@ -1,5 +1,6 @@
 package com.LikeMiracleTeam.MemorialBackend.auth;
 
+import com.LikeMiracleTeam.MemorialBackend.dto.response.UserResponse;
 import com.LikeMiracleTeam.MemorialBackend.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,5 +45,9 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public UserResponse toDto() {
+        return new UserResponse(user);
     }
 }

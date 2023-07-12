@@ -1,5 +1,6 @@
 package com.LikeMiracleTeam.MemorialBackend.configuration;
 
+import com.LikeMiracleTeam.MemorialBackend.filter.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,6 +19,9 @@ import java.util.List;
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final JwtProvider jwtProvider;
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
 
@@ -30,6 +34,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated()
+                .and()
+                .apply(new FilterConfig(jwtProvider))
                 .and()
                 .cors().configurationSource(request -> {
                     CorsConfiguration cors = new CorsConfiguration();
